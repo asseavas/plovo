@@ -1,19 +1,23 @@
-import React, {useState} from 'react';
-import {Dish, DishMutation} from '../../types';
+import React, { useState } from 'react';
+import { Dish, DishMutation } from '../../types';
 
 interface Props {
   onSubmit: (dish: Dish) => void;
 }
 
-const DishForm: React.FC<Props> = ({onSubmit}) => {
-  const [dishMutation, setDishMutation] = useState<DishMutation>({
-    name: '',
-    description: '',
-    image: '',
-    price: '',
-  });
+const initialState: DishMutation = {
+  name: '',
+  description: '',
+  image: '',
+  price: '',
+};
 
-  const changeDish = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+const DishForm: React.FC<Props> = ({ onSubmit }) => {
+  const [dishMutation, setDishMutation] = useState<DishMutation>(initialState);
+
+  const changeDish = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     setDishMutation((prev) => ({
       ...prev,
       [event.target.name]: event.target.value,
@@ -29,12 +33,7 @@ const DishForm: React.FC<Props> = ({onSubmit}) => {
       price: parseFloat(dishMutation.price),
     });
 
-    setDishMutation({
-      name: '',
-      description: '',
-      image: '',
-      price: '',
-    });
+    setDishMutation(initialState);
   };
 
   return (
@@ -87,7 +86,9 @@ const DishForm: React.FC<Props> = ({onSubmit}) => {
           value={dishMutation.price}
         />
       </div>
-      <button type="submit" className="btn btn-primary mt-3">Create</button>
+      <button type="submit" className="btn btn-primary mt-3">
+        Create
+      </button>
     </form>
   );
 };
