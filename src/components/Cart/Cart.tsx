@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
 import { CartDish } from '../../types';
-import CartItem from './CartItem';
 import Modal from '../Modal/Modal';
+import { useNavigate } from 'react-router-dom';
+import CartDishes from './CartDishes';
 
 interface Props {
   cartDishes: CartDish[];
 }
 
 const Cart: React.FC<Props> = ({ cartDishes }) => {
-  const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
 
-  const total = cartDishes.reduce((sum, cartDish) => {
-    return sum + cartDish.amount * cartDish.dish.price;
-  }, 0);
+  const [showModal, setShowModal] = useState(false);
 
   let cart = (
     <div className="alert alert-primary">Cart is empty! Add something!</div>
@@ -21,17 +20,7 @@ const Cart: React.FC<Props> = ({ cartDishes }) => {
   if (cartDishes.length > 0) {
     cart = (
       <>
-        {cartDishes.map((cartDish) => (
-          <CartItem key={cartDish.dish.id} cartDish={cartDish} />
-        ))}
-        <div className="card border-0 p-2">
-          <div className="row">
-            <div className="col text-end">Total:</div>
-            <div className="col-3 text-end">
-              <strong>{total}</strong> KGS
-            </div>
-          </div>
-        </div>
+        <CartDishes cartDishes={cartDishes} />
         <button
           className="w-100 btn btn-primary"
           onClick={() => setShowModal(true)}
@@ -47,13 +36,21 @@ const Cart: React.FC<Props> = ({ cartDishes }) => {
       <h4>Cart</h4>
       {cart}
       <Modal show={showModal} title="Order" onClose={() => setShowModal(false)}>
-        <div className="modal-body">Content</div>
+        <div className="modal-body">
+          <p>Do you want to continue to checkout?</p>
+        </div>
         <div className="modal-footer">
           <button
             className="btn btn-danger"
             onClick={() => setShowModal(false)}
           >
             Cancel
+          </button>
+          <button
+            className="btn btn-success"
+            onClick={() => navigate('checkout')}
+          >
+            Continue
           </button>
         </div>
       </Modal>
