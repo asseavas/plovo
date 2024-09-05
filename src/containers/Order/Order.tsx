@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ApiOrder, Customer } from '../../types';
+import { ApiOrder, ApiOrderDishes, Customer } from '../../types';
 import axiosApi from '../../axiosApi';
 import { useNavigate } from 'react-router-dom';
 import Spinner from '../../components/Spinner/Spinner';
@@ -31,9 +31,17 @@ const Order: React.FC = () => {
     event.preventDefault();
     setIsLoading(true);
 
+    const apiOrderDishes = cartDishes.reduce<ApiOrderDishes>(
+      (acc, cartDish) => {
+        acc[cartDish.dish.id] = cartDish.amount;
+        return acc;
+      },
+      {},
+    );
+
     const order: ApiOrder = {
       customer,
-      dishes: cartDishes,
+      dishes: apiOrderDishes,
     };
 
     try {

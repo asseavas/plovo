@@ -30,16 +30,29 @@ export interface Customer {
   phone: string;
 }
 
+export interface ApiOrderDishes {
+  [dishId: string]: number;
+}
+
 export interface ApiOrder {
   customer: Customer;
-  dishes: CartDish[];
+  dishes: ApiOrderDishes;
 }
 
 export interface ApiOrders {
   [id: string]: ApiOrder;
 }
 
-export interface Order extends ApiOrder {
+export interface OrderDishInfo {
   id: string;
+  amount: number;
+  title: string;
+  price: number;
+}
+
+export interface Order {
+  id: string;
+  customer: Customer;
   totalPrice: number;
+  dishes: OrderDishInfo[];
 }
