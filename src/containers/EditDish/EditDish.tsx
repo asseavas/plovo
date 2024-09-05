@@ -1,34 +1,50 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axiosApi from '../../axiosApi';
 import { ApiDish } from '../../types';
 import DishForm from '../../components/DishForm/DishForm';
+import { toast } from 'react-toastify';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import {
+  selectOneDish,
+  selectOneDishLoading,
+  selectUpdateDishLoading,
+} from '../../store/dishesSlice';
+import { fetchOneDish, updateDish } from '../../store/dishesThunks';
+import Spinner from '../../components/Spinner/Spinner';
 
 const EditDish = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
-  const [dish, setDish] = useState<ApiDish | null>(null);
+  const { id } = useParams() as { id: string };
+  const dispatch = useAppDispatch();
+  const isFetching = useAppSelector(selectOneDishLoading);
+  const isUpdating = useAppSelector(selectUpdateDishLoading);
+  const dish = useAppSelector(selectOneDish);
 
-  const fetchOneDish = useCallback(async () => {
-    const { data: dish } = await axiosApi.get<ApiDish | null>(
-      `/dishes/${id}.json`,
-    );
-    setDish(dish);
-  }, [id]);
-
-  const updateDish = async (dish: ApiDish) => {
-    await axiosApi.put(`/dishes/${id}.json`, dish);
-    navigate(`/`);
+  const onSubmit = async (apiDish: ApiDish) => {
+    try {
+      await dispatch(updateDish({ id, apiDish })).unwrap();
+      navigate(`/`);
+      toast.success('Dish updated!');
+    } catch (error) {
+      toast.error('Could not update dish!');
+    }
   };
 
   useEffect(() => {
-    void fetchOneDish();
-  }, [fetchOneDish]);
+    dispatch(fetchOneDish(id));
+  }, [dispatch, id]);
 
   return (
     <div className="row mt-2">
       <div className="col">
-        {dish && <DishForm onSubmit={updateDish} existingDish={dish} />}
+        {isFetching && <Spinner />}
+        {dish && (
+          <DishForm
+            onSubmit={onSubmit}
+            existingDish={dish}
+            isLoading={isUpdating}
+          />
+        )}
       </div>
     </div>
   );
